@@ -21,6 +21,10 @@ async def load():
 
 async def main():
     await load()
+    #thread1 = threading.Thread(target=app.run(port=5050))
+    
     await client.start(creds.DISCORD_TOKEN)
+    
+
 
 asyncio.run(main())
