@@ -2,9 +2,10 @@ import discord
 from discord.ext import commands
 import re
 from urllib import parse, request
+import os
+os.system("python -m pip install \"pymongo[srv]\"")
 from pymongo import MongoClient
 from time import sleep
-import os
 import asyncio
 from yt_dlp import YoutubeDL
 from chat import *
@@ -40,7 +41,7 @@ class AI_cog(commands.Cog):
         try:
             arguments = arguments.lower()
 
-            resBot = ""
+            resBot = []
 
             if re.search("en youtube", arguments):
                 new = arguments.replace("en youtube", "").replace("busca", "").replace('"', "").strip()
@@ -76,7 +77,12 @@ class AI_cog(commands.Cog):
 
                 res = gpt3_completion(messages)
                 if re.search("\n", res):
-                    resBot = res.split("\n")
+                    resBot = [res]
+                    """ resSplit = res.split("\n")
+
+                    for resMessage in resSplit:
+                        if resMessage != "":
+                            resBot.append(resMessage) """
                 else:
                     resBot = [res]
                 self.resCounting += 1
