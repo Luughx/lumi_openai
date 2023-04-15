@@ -32,7 +32,9 @@ def index():
 async def main():
     await load()
     thread1 = threading.Thread(target= lambda: app.run(port=8080, host="0.0.0.0"))
+    print("loading server")
     thread1.start()
+    print("loading discord")
     await client.start(creds.DISCORD_TOKEN)
     
 asyncio.run(main())
