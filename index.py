@@ -33,7 +33,7 @@ async def main():
     #thread1 = threading.Thread(target=app.run(port=5050))
         
     await client.start(creds.DISCORD_TOKEN)
-    app.run(port=5050)
+    #app.run(port=5050)
     
 
 
