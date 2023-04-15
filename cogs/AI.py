@@ -9,12 +9,13 @@ import asyncio
 from yt_dlp import YoutubeDL
 from chat import *
 import time
+import creds
 
 class AI_cog(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-        self.mongo_uri = "mongodb://localhost:27017"
+        self.mongo_uri = creds.MONGODB_URI
         self.clientDB = MongoClient(self.mongo_uri)
         self.db = self.clientDB["lumi_openai"]
         self.collectionChannels = self.db["channels_lumi"]
