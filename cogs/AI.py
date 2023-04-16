@@ -3,7 +3,7 @@ from discord.ext import commands
 import re
 from urllib import parse, request
 import os
-os.system("python -m pip install \"pymongo[srv]\"")
+#os.system("python -m pip install \"pymongo[srv]\"")
 from pymongo import MongoClient
 from time import sleep
 import asyncio
@@ -17,7 +17,7 @@ class AI_cog(commands.Cog):
         self.client = client
 
         self.mongo_uri = creds.MONGODB_URI
-        self.clientDB = MongoClient(self.mongo_uri)
+        self.clientDB = MongoClient(self.mongo_uri, connect=False)
         self.db = self.clientDB["lumi_openai"]
         self.collectionChannels = self.db["channels_lumi"]
         self.collectionChats = self.db["chats_lumi"]
@@ -319,6 +319,17 @@ class AI_cog(commands.Cog):
                 await message.channel.send(messageRes)
         #await self.client.process_commands(message)
 
+    """ @commands.command()
+    async def music(self, ctx, *args):
+        try:
+            voice_channel = ctx.author.voice.channel
+            if voice_channel != None:
+                await voice_channel.connect()
+                ctx.guild.voice_client.play(discord.FFmpegPCMAudio(executable="E:/Windows/src/ffmpeg/bin/ffmpeg.exe", source="music.wav"))
+                await ctx.send("reproduciendo...")
+        except Exception as err:
+            print(err)
+    """
     @commands.command()
     async def channel(self, ctx, *args):
         channel = self.collectionChannels.find_one({"channel": ctx.channel.id})

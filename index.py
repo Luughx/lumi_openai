@@ -9,7 +9,7 @@ import threading
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = commands.Bot(command_prefix="l!", intents=intents)
+client = commands.Bot(command_prefix="t!", intents=intents)
 
 @client.event
 async def on_ready():
