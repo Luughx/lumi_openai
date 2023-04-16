@@ -70,15 +70,31 @@ class AI_cog(commands.Cog):
                 messages.append({"role": "user", "content": arguments})
 
                 res = gpt3_completion(messages)
-                if re.search("\n", res):
-                    resBot = [res]
-                    """ resSplit = res.split("\n")
 
-                    for resMessage in resSplit:
-                        if resMessage != "":
-                            resBot.append(resMessage) """
+                if len(res) >= 2000:
+                    resSplit = res.split(" ")
+                    division = 0
+                    for i in range(5):
+                        if len(res) / (i+1) < 2000:
+                            division = i+1
+                            break
+
+                    parts = len(res) / division
+                    cacheSplit = []
+                    characters = 0
+                    for item in resSplit:
+                        characters += len(item)
+                        cacheSplit.append(item)
+                        
+                        if characters >= parts:
+                            resBot.append(" ".join(cacheSplit))
+                            cacheSplit = []
+                            characters = 0
+                    resBot.append(" ".join(cacheSplit))
+
                 else:
                     resBot = [res]
+                    
                 self.resCounting += 1
 
                 messages.append({"role": "assistant", "content": res})
@@ -93,20 +109,37 @@ class AI_cog(commands.Cog):
             return resBot
         except Exception as err:
             print(err)
-            return ["tuve un error"]
+            return ["tuve un error", f"```{err}```"]
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
             return
         if str(message.channel.type) == "private":
+            messageRes = await message.channel.send("Pensando...")
             res = self.response(message, message.content)
-            for messageRes in res:
-                await message.channel.send(messageRes)
+            first = True
+            for msg in res:
+                if first:
+                    first = False
+                    await messageRes.edit(content=msg)
+                    continue
+                await message.content.send(msg)
+                sleep(0.5)
         if self.collectionChannels.find_one({"channel": message.channel.id}) and not message.content.startswith("l!") and not message.content.startswith("#"):
+            resFunctions = await self.functions(message, message.content)
+            if resFunctions:
+                return
+            messageRes = await message.channel.send("Pensando...")
             res = self.response(message, message.content)
-            for messageRes in res:
-                await message.channel.send(messageRes)
+            first = True
+            for msg in res:
+                if first:
+                    first = False
+                    await messageRes.edit(content=msg)
+                    continue
+                await message.content.send(msg)
+                sleep(0.5)
         #await self.client.process_commands(message)
 
     @commands.command()
@@ -122,10 +155,20 @@ class AI_cog(commands.Cog):
     @commands.command()
     async def chat(self, ctx, *args):
         arguments = " ".join(args)
-        res = self.response(ctx, arguments)
+        resFunctions = await self.functions(ctx, arguments)
+        if resFunctions:
+            return
         
+        messageRes = await ctx.send("Pensando...")
+        res = self.response(ctx, arguments)
+        first = True
         for message in res:
+            if first:
+                first = False
+                await messageRes.edit(content=message)
+                continue
             await ctx.send(message)
+            sleep(0.5)
 
 async def setup(client):
     await client.add_cog(AI_cog(client))
